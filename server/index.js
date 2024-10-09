@@ -1,7 +1,8 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
-const RegisterModel = require("./schemas/allSchemas")
+const {RegisterModel} = require("./schemas/allSchemas")
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config(); 
 
@@ -21,28 +22,43 @@ mongoose.connect(process.env.MONGO_URL)
 
 const saltRounds = 10;  // Number of salt rounds for bcrypt hashing
 
+
+const generateJWT = (id) =>{
+    return jwt.sign({id},process.env.JWT_SECRET,{expiresIn : '30d'})
+}
+
+const {protect} = require("./middleware/authmiddleware")
+
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
+
+    // Check for existing user
     RegisterModel.findOne({ email: email })
         .then(user => {
             if (user) {
                 return res.status(400).json({ error: "User with this email already exists" });
-            } else {
-                bcrypt.hash(password, saltRounds, (err, hash) => {
-                    if (err) {
-                        return res.status(500).json({ error: "Error hashing password" });
-                    }
-                    RegisterModel.create({ name, email, password: hash })
-                        .then(newUser => res.json({ message: "User registered successfully", newUser }))
-                        .catch(err => res.status(500).json({ error: "Error creating user" }));
-                });
             }
+            
+            bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error hashing password" });
+                }
+                const newUser = new RegisterModel({ name, email, password: hashedPassword });
+
+                newUser.save()
+                    .then(() => res.json({ message: "User registered successfully", id: newUser.id, email: newUser.email, token: generateJWT(newUser.id) }))
+                    .catch(err => {
+                        console.error(err); // Log the error for debugging
+                        res.status(500).json({ error: "Error saving user to the database." });
+                    });
+            });
         })
-        .catch(err => res.status(500).json({ error: "Error checking for existing user" }));
+        .catch(err => {
+            console.error(err); // Log the error for debugging
+            res.status(500).json({ error: "Error checking for existing user." });
+        });
 });
+
 
 
 app.post('/login', (req, res) => {
@@ -58,15 +74,24 @@ app.post('/login', (req, res) => {
                     return res.status(500).json({ error: "Error during password comparison" });
                 }
                 if (isMatch) {
-                    res.json("Success");
+                    res.json(res.json({ message: "User registered successfully", id: user.id, email: user.email,token : generateJWT(user.id) }))
                 } else {
-                    res.status(400).json({ error: "Password is incorrect" });
+                    res.status(400).json({ error: "Invalid credentials" });
                 }
             });
         })
         .catch(err => res.status(500).json({ error: "Error finding user" }));
 });
 
+app.get('/linkInput',protect,async (req,res)=>{
+    const {id,name,email} = await RegisterModel.findById(req.user.id)
+    res.status(200).json({message:"Verified user",id:id,name:name,email:email})
+})
+
+app.get('/products',protect,async (req,res)=>{
+    const {id,name,email} = await RegisterModel.findById(req.user.id)
+    res.status(200).json({message:"Verified user",id:id,name:name,email:email})
+})
 
 app.listen(3001,()=>{
     console.log("server is running")

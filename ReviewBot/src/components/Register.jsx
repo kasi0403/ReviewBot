@@ -17,7 +17,7 @@ export default function Register() {
     axios.post('http://localhost:3001/register', { name, email, password })
       .then(result => {
         console.log(result);
-        
+
         if (result.data.message === "User registered successfully") {
           setPopupMessage("Registration successful! Redirecting to login...");
           setPopupType("success");
@@ -26,7 +26,7 @@ export default function Register() {
             navigate('/login');
           }, 3000);
         } else {
-          setPopupMessage("Registration failed. Please try again.");
+          setPopupMessage(result.data.error || "Registration failed. Please try again."); // Use the error message from the response
           setPopupType("error");
           setTimeout(() => {
             setPopupMessage(null); // Hide popup after 3 seconds
@@ -34,14 +34,17 @@ export default function Register() {
         }
       })
       .catch(err => {
-        console.log(err);
-        setPopupMessage("An error occurred. Please try again.");
+        // Log the error for further analysis
+        console.error(err.response.data); // Print the full error response to the console
+        // Display the specific error message from the response if available
+        setPopupMessage(err.response?.data?.error || "An error occurred. Please try again."); // Handle specific error messages
         setPopupType("error");
         setTimeout(() => {
           setPopupMessage(null); // Hide popup after 3 seconds
         }, 3000);
       });
-  };
+};
+
   
 
   return (

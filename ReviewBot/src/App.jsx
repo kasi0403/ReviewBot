@@ -7,6 +7,7 @@ import LinkInput from "./components/LinkInput";
 import Home from "./components/Home"; // Ensure you import Home
 import ProductList from "./components/ProductList";
 import Register from "./components/Register";
+import Chatbot from "./components/Chatbot";
 import axios from "axios";
 
 const BgAnimation = () => {
@@ -38,6 +39,7 @@ export default function App() {
             <Route exact path="/register" element={<Register/>}/>
             <Route path="/products" element={<ProductList />} />
             <Route path="/link" element={<LinkInput />} />
+            <Route path="/chatbot" element={<Chatbot/>} />
           </Routes>
         </div>
       </div>
