@@ -25,35 +25,46 @@ const RegisterModel = mongoose.model("users",RegisterSchema)
 
 
 // products list
+
 const ProductSchema = new mongoose.Schema({
     productId: {
-        type : String,
+        type: String,
         required: true,
         unique: true,
     },
-    productName:{
+    productName: {
         type: String,
-        require: true
+        required: true,
     },
-    rating :{
-        type:Number,
-        required : true,
-        min : 0,
-        max : 5,
+    reviewList: [{
+        reviewText: String,
+        reviewRating: {
+            type: Number,
+            min: 0,
+            max: 5,
+            required: true,
+        },
+    }],
+    AvgRating: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0,
+        max: 5,
     },
-    reviewSummary : {
+    reviewSummary: {
         type: String,
-        required : true,
+        required: true,
     },
-    pros:{
-        type : [String],
+    pros: {
+        type: [String],
     },
-    cons:{
+    cons: {
         type: [String],
     }
-},{ timestamps: true });
+}, { timestamps: true });
 
-const Product = mongoose.model('products', ProductSchema);
+const Product = mongoose.model('Product', ProductSchema);
 
 
 // specific chats

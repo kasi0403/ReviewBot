@@ -1,88 +1,68 @@
-.container{
+.container {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 40%;
-    height: 65%;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-    background-color: rgba(20, 157, 255, 0.466);
-    border-radius: 1rem;
-    /* Center the container */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.content{
-    flex: 2;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    height: 100vh; /* Full viewport height to center vertically */
+    width: 100vw; /* Full viewport width */
+    background-color: #f9f9f900; /* Light background color */
+    padding: 20px; /* Padding for mobile devices */
+    box-sizing: border-box; /* Ensure padding doesn't affect the width */
 }
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(20, 157, 255, 0.466); /* Your background color */
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px; /* Limit max width for better responsiveness */
+    width: 100%; /* Full width for mobile */
+}
+
 .input {
-    width: 320px;
+    width: 100%; /* Full width for inputs */
     height: 35px;
-    padding: 5px;
-    margin: 5px 0;
+    padding: 8px;
+    margin: 10px 0;
     outline: none;
     border: 1px solid #2c444e;
-    border-radius: 2px;
-    font-size: 13px;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .button {
+    width: 100%; /* Full width for the button */
     font-size: 18px;
     font-weight: 500;
-    padding: 8px 15px;
+    padding: 10px;
     color: white;
     background-color: #000000bc;
     border-radius: 12px;
-    margin: 10px 0 0 0;
+    margin: 10px 0;
     outline: none;
     border: none;
     cursor: pointer;
 }
-
 
 .text {
     font-size: 14px;
-    color: #2c444e;
+    color: #fef9f9;
     margin: 5px 0;
     padding: 0;
+    text-align: center;
 }
 
+@media (max-width: 768px) {
+    .content {
+        padding: 1.5rem;
+        max-width: 90%; /* Make content box smaller on mobile */
+    }
 
-
-.google_btn {
-    width: 230px;
-    height: 40px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    background-color: white;
-    box-shadow: rgb(0 0 0 / 20%) 0px 3px 1px -2px, rgb(0 0 0 / 14%) 0px 2px 2px 0px, rgb(0 0 0 / 12%) 0px 1px 5px 0px;
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 0 20px 0;
-    color: #2c444e;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.google_btn > img{
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-}
-
-.google_btn > span{
-    margin-left: 10px;
+    .input, .button {
+        font-size: 16px; /* Slightly smaller font size on mobile */
+    }
 }

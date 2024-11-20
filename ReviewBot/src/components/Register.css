@@ -9,7 +9,7 @@
     padding: 20px;
     position: relative;
     z-index: 1;
-    background-color: rgba(20, 157, 255, 0.466);
+    /* background-color: rgba(20, 157, 255, 0.466); */
     border-radius: 1rem;
     /* Center the container */
     position: absolute;

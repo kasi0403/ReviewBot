@@ -1,40 +1,34 @@
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
-const {RegisterModel} = require('../schemas/allSchemas');
+const { RegisterModel } = require('../schemas/allSchemas'); // Adjust path as needed
 
-const protect = asyncHandler(async (req, res, next) => {
-  let token;
+const protect = async (req, res, next) => {
+    let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
-    //   console.log("Token received:", token);
+    // Check if the token is provided in the request headers
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            // Get the token from the Authorization header
+            token = req.headers.authorization.split(' ')[1];
+            console.log('Token received:', token); // Log the received token
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //   console.log("Decoded token:", decoded);
+            // Verify the token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            console.log('Decoded token:', decoded); // Log the decoded token
 
-      // Get user from the token
-      req.user = await RegisterModel.findById(decoded.id).select('-password');
-    //   console.log("User found:", req.user);
+            // Attach the user ID to the request object
+            req.user = await RegisterModel.findById(decoded.id).select('-password'); // Exclude password from user object
 
-      if (!req.user) {
-        res.status(401).json({ message: 'User not found' });
-        return;
-      }
-
-      next();
-    } catch (error) {
-      console.error('Authorization error:', error.message);
-      res.status(401).json({ message: 'Not authorized' });
+            next(); // Call the next middleware or route handler
+        } catch (error) {
+            console.error('Token verification error:', error);
+            res.status(401).json({ message: 'Not authorized, token failed' });
+        }
     }
-  } else {
-    res.status(401).json({ message: 'Not authorized, no token' });
-  }
-});
+
+    // If no token is provided
+    if (!token) {
+        return res.status(401).json({ message: 'Not authorized, no token' });
+    }
+};
 
 module.exports = { protect };

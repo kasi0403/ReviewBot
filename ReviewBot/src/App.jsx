@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from "./components/Navbar";
-import './bgAnimation.css';  // Make sure this path is correct
+import './bgAnimation.css'; // Ensure this path is correct
 import Login from "./components/Login";
 import LinkInput from "./components/LinkInput";
 import Home from "./components/Home"; // Ensure you import Home
 import ProductList from "./components/ProductList";
 import Register from "./components/Register";
 import Chatbot from "./components/Chatbot";
-import axios from "axios";
 
 const BgAnimation = () => {
   useEffect(() => {
@@ -26,20 +25,28 @@ const BgAnimation = () => {
 };
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true); // User is logged in if token exists
+    }
+  }, []);
 
   return (
     <Router>
-      <div >
-         <BgAnimation /> {/*Ensure this is uncommented */}
-        <Navbar />
+      <div>
+        {/* <BgAnimation />  */}
+        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         <div>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route exact path="/login" element={<Login/>}/>
-            <Route exact path="/register" element={<Register/>}/>
-            <Route path="/products" element={<ProductList />} />
+            <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+            <Route exact path="/register" element={<Register />} />
+            {/* <Route path="/products" element={<ProductList />} /> */}
             <Route path="/link" element={<LinkInput />} />
-            <Route path="/chatbot" element={<Chatbot/>} />
+            <Route path="/chatbot" element={<Chatbot />} />
           </Routes>
         </div>
       </div>

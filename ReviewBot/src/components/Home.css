@@ -1,21 +1,83 @@
-/* Home.css */
-.content-container {
+/* Main Home Container */
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@100;400;500;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@100;400;500;700&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+.home-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Left Image Section */
+  .image-section {
+    width: 50%; /* Left half for the image */
+    background-image: url('https://res.cloudinary.com/duwadnxwf/image/upload/v1729736625/axBot_xfoz0m.webp'); /* Replace with your image */
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* Right Text Section */
+  .text-section {
+    /* font-family: 'Playfair Display', serif; */
+    width: 50%; /* Right half for the text */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    width: 40%;
-    height: 30%;
+    align-items: flex-start;
+    padding-left: 5%;
     color: white;
-    text-align: center;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-    background-color: rgba(29, 29, 29, 0.8);
-    
-    /* Center the container */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+  }
+  
+  .text-section h1 {
+    /* font-family: "Rajdhani", sans-serif; */
+    font-size: 4rem;
+    font-weight:600;
+    margin-bottom: 1rem;
+    color: black; /* Adjust color */
+  }
+  
+  .text-section p {
+    /* font-family: "Rajdhani", sans-serif; */
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: black; /* Adjust color */
+  }
+  
+  .discover-btn {
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    background-color: #ffffffa6;
+    color: rgb(0, 0, 0);
+    border:10;
+    border-color: black;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .discover-btn:hover {
+    background-color: #4ca5117b;
+  }
+  .second-home{
+    width: auto;
+    height: 100vh;
+    background-color: black;
+    color: white;
+  }
+
+
+  
+  @media (max-width: 768px) {
+    .text-section h1 {
+      font-size: 2.5rem;
+    }
+  
+    .text-section p {
+      font-size: 1rem;
+    }
+  
+    .discover-btn {
+      padding: 8px 20px;
+      font-size: 1rem;
+    }
+  }
+   
