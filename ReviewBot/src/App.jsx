@@ -8,44 +8,23 @@ import Home from "./components/Home"; // Ensure you import Home
 import ProductList from "./components/ProductList";
 import Register from "./components/Register";
 import Chatbot from "./components/Chatbot";
-
-const BgAnimation = () => {
-  useEffect(() => {
-    const bgAnimation = document.getElementById("bgAnimation");
-    const numberOfColorBoxes = 400;
-
-    for (let i = 0; i < numberOfColorBoxes; i++) {
-      const colorBox = document.createElement("div");
-      colorBox.classList.add("colorBox");
-      bgAnimation.append(colorBox);
-    }
-  }, []);
-
-  return <div className="bgAnimation" id="bgAnimation"></div>;
-};
+import ProdDes from "./components/ProdDes";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true); // User is logged in if token exists
-    }
-  }, []);
+  const [details,setDetails] = useState({});
 
   return (
     <Router>
       <div>
-        {/* <BgAnimation />  */}
         <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         <div>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route exact path="/register" element={<Register />} />
-            {/* <Route path="/products" element={<ProductList />} /> */}
-            <Route path="/link" element={<LinkInput />} />
+            <Route path="/link" element={<LinkInput setDetails={setDetails}/>} />
+            <Route path="/Description" element={<ProdDes details={details}/>} />
             <Route path="/chatbot" element={<Chatbot />} />
           </Routes>
         </div>

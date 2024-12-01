@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 from playwright.sync_api import sync_playwright
+from flask_cors import CORS
+
 import time
 
 app = Flask(__name__)
+CORS(app)
 
 def get_product_details(page):
     try:
@@ -59,7 +62,7 @@ def get_reviews(page):
     pc = 0
     count = 0
 
-    while pc < 50:
+    while pc < 5:
         review_containers = page.query_selector_all("div.EKFha-")
         rating_elements = page.query_selector_all("div[class*='EKFha-'] div.XQDdHH.Ga3i8K")
 
@@ -151,4 +154,4 @@ def scrape():
         return jsonify({"error": f"Error occurred: {e}"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5002)
+    app.run(debug=True, port=5000)

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 import axios from 'axios';
-import Popup from './Popup'; // Import Popup component
+import Success from './Success'
+import Error from './Error'
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [popupMessage, setPopupMessage] = useState(null); // State to handle popup message
-  const [popupType, setPopupType] = useState(''); // 'success' or 'error'
-  const navigate = useNavigate();
+  const [showError,setShowError] = useState(false);
+  const [showSucc,setShowSucc] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,29 +19,24 @@ export default function Register() {
         console.log(result);
 
         if (result.data.message === "User registered successfully") {
-          setPopupMessage("Registration successful! Redirecting to login...");
-          setPopupType("success");
+          setShowSucc(true);
           setTimeout(() => {
-            setPopupMessage(null); // Hide popup after 3 seconds
+            setShowSucc(false);
             navigate('/login');
-          }, 3000);
+          }, 3500);
         } else {
-          setPopupMessage(result.data.error || "Registration failed. Please try again."); // Use the error message from the response
-          setPopupType("error");
+          setShowError(true)
           setTimeout(() => {
-            setPopupMessage(null); // Hide popup after 3 seconds
-          }, 3000);
+            setShowError(false);
+          }, 3500);
         }
       })
       .catch(err => {
-        // Log the error for further analysis
-        console.error(err.response.data); // Print the full error response to the console
-        // Display the specific error message from the response if available
-        setPopupMessage(err.response?.data?.error || "An error occurred. Please try again."); // Handle specific error messages
-        setPopupType("error");
+        console.error(err.response.data); 
+        setShowError(true)
         setTimeout(() => {
-          setPopupMessage(null); // Hide popup after 3 seconds
-        }, 3000);
+          setShowError(false);
+        }, 3500);
       });
 };
 
@@ -49,12 +44,12 @@ export default function Register() {
 
   return (
     <>
-      {popupMessage && <Popup message={popupMessage} type={popupType} />} {/* Popup outside of container */}
+      {showSucc && <Success/>}
+      {showError && <Error/>}
       <div className='container'>
-        <h1>Register Form</h1>
-        <div className='content'>
-          <h2>Create Account</h2>
           <form className='content' onSubmit={handleSubmit}>
+          <div className='head'>Register Form</div>
+          <h1>Create Account</h1>
             <input
               type="text"
               className="input"
@@ -80,9 +75,8 @@ export default function Register() {
           </form>
           <p className="text">
             Already have an account? <Link to="/login">LogIn</Link>
-          </p>
+        </p>
         </div>
-      </div>
     </>
   );
 }

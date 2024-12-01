@@ -1,19 +1,24 @@
 import React, { useRef } from "react";
 import "./Home.css"; // Ensure correct path for your CSS file
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   const secondHomeRef = useRef(null);
 
   const handleClick = () => {
     secondHomeRef.current.scrollIntoView({ behavior: "smooth" });
   };
+  const handleDirect = () =>{
+    navigate('/link')
+  }
 
   return (
     <div>
       <div className="home-container">
-        <div className="image-section"></div> {/* Left image */}
+        <div className="image-section"></div> 
         <div className="text-section">
-          <h1>Explore AzBot</h1>
+          <h1>Explore ProBot</h1>
           <p>Your Virtual Product Assistant</p>
           <button className="discover-btn" onClick={handleClick}>Discover More</button>
         </div>
@@ -21,12 +26,15 @@ const Home = () => {
       
       {/* New Section with Waves */}
       <div className="second-home" ref={secondHomeRef}>
-        <div>
-          <h2>Your Next Generation Product Helper</h2>
-          <p>Powered by AI to assist your product discovery journey</p>
+          <div className="text-section">
+            <h1>Curiosity meets clarity - Discover your product.</h1>
+          </div>
+          <div className="btn-section">
+          <p>Try out the chatbot feature today!</p>
+            <button className="discover-btn" onClick={handleDirect}>Try Now</button>
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -3,6 +3,8 @@ node_modules/
 
 # environment variables
 .env
+models/GScrape.py
+models/WebScrape.py
 
 
 
