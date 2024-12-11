@@ -8,7 +8,6 @@ const LinkInputPage = ({setDetails}) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [reviews, setReviews] = useState([]);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -19,9 +18,8 @@ const LinkInputPage = ({setDetails}) => {
     try {
       const response = await axios.post('http://localhost:3001/linkInput', { inputValue });
       console.log("Received in frontend = ", response.data.reviews);
-      const {product_details,reviews} = response.data.reviews; // Assuming `reviews` is an array
-      setReviews(reviews);
-      setDetails(product_details);
+      const {product_details,reviews,specifications,highlights} = response.data.reviews; // Assuming `reviews` is an array
+      setDetails({details:product_details,reviews,specifications,highlights});
       console.log("frontend prod details = ",product_details)
       // Pass reviews to Description page via props
       navigate('/description');

@@ -9,6 +9,8 @@ import ProductList from "./components/ProductList";
 import Register from "./components/Register";
 import Chatbot from "./components/Chatbot";
 import ProdDes from "./components/ProdDes";
+import './index.css';
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

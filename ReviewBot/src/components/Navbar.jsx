@@ -18,7 +18,7 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
 
     return (
         <header className="header">
-            <Link to="/" className="logo">Logo</Link>
+            <Link to="/" className="logo">ProBot</Link>
             <div className="hamburger" onClick={toggleMenu}>
                 <div className={`bar ${isMenuOpen ? 'open' : ''}`}></div>
                 <div className={`bar ${isMenuOpen ? 'open' : ''}`}></div>

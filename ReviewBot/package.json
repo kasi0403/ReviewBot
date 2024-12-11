@@ -12,13 +12,18 @@
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@heroicons/react": "^1.0.6",
     "@mui/material": "^6.1.8",
+    "@mui/x-charts": "^7.23.1",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
-    "chart.js": "^4.4.6",
+    "chart.js": "^4.4.7",
+    "postcss": "^8.4.49",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "tailwindcss": "^3.4.16"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

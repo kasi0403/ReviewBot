@@ -7,7 +7,7 @@ require('dotenv').config();
 const axios = require('axios');
 const qs = require('qs');
 const { HfInference } = require('@huggingface/inference');
-const hf = new HfInference(process.env.HUGGING_FACE);
+const client = new HfInference(process.env.HUGGING_FACE);
 
 const app = express();
 app.use(express.json());
@@ -22,6 +22,7 @@ mongoose.connect(process.env.MONGO_URL)
   });
 
 const saltRounds = 10;  // Number of salt rounds for bcrypt hashing
+
 
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
@@ -91,6 +92,7 @@ app.post('/linkInput', async (req, res,next) => {
           });
         console.log("data received in express = ",response.data)
         // req.reviews = response.data;
+        // next();
         res.status(200).json({
             message: "Scraped reviews successfully",
             reviews: response.data 
@@ -102,73 +104,73 @@ app.post('/linkInput', async (req, res,next) => {
     }
     
 });
-async function querySentimentAPI(reviews) {
-    try {
-        const sentiments = []; // Array to store sentiment results for each review
 
-        // Loop through each review and query the API
-        for (let i = 0; i < reviews.length; i++) {
-            const payload = { text: reviews[i] }; // Use `text` as the key
-            const response = await axios.post(API_URL, payload, { headers });
 
-            if (response.status === 200) {
-                // Add the review and its sentiment to the results
-                sentiments.push({
-                    review: reviews[i],
-                    sentiment: response.data[0], // Assuming API returns an array of sentiments
-                });
-            } else {
-                console.error(`Unexpected response status for review ${i}:`, response.status);
-            }
-        }
-
-        return sentiments; // Return the sentiments array
-    } catch (error) {
-        if (error.response) {
-            console.error("Error Response Data:", error.response.data);
-        } else {
-            console.error("Network or other error:", error.message);
-        }
-        throw new Error("Failed to perform sentiment analysis");
-    }
-}
-
-// Route for sentiment analysis
 app.post('/analyzeSentiment', async (req, res) => {
-    reviews = req.body;
-    console.log(reviews)
+    console.log("Received request:", req.body);
+    const { reviews } = req.body;
+
     if (!reviews || !Array.isArray(reviews)) {
-        return res.status(400).json({ message: 'Invalid input. Expected an array of reviews.' });
+        return res.status(400).json({ error: "Invalid input. Expected an array of reviews." });
     }
 
     try {
-        // Step 1: Call the Hugging Face API for sentiment analysis
-        const sentimentResults = await querySentimentAPI(reviews.sentance);
-
-        // Step 2: Count positive and negative sentiments
-        let positiveCount = 0;
-        let negativeCount = 0;
-
-        sentimentResults.forEach(result => {
-            if (result.sentiment.label === 'POSITIVE') {
-                positiveCount++;
-            } else if (result.sentiment.label === 'NEGATIVE') {
-                negativeCount++;
+        const reviewTexts = reviews.map((review) => review.review);
+        console.log(reviewTexts);
+        const response = await axios.post('http://localhost:5001/senti', {reviewTexts} , {
+            headers: {
+                'Content-Type': 'application/json',  
             }
         });
 
-        // Step 3: Send back the sentiment results
+        const positiveCount = response.data.positive;
+        const negativeCount = response.data.negative;
+        console.log("Sentiment Analysis Response:", response.data);
+
         res.status(200).json({
-            message: 'Sentiment analysis completed successfully',
-            results: sentimentResults, // Array of reviews and their sentiments
-            positiveCount,
-            negativeCount,
+            positive: positiveCount,
+            negative: negativeCount
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error occurred during sentiment analysis', error: error.message });
+        console.error("Error during sentiment analysis:", error);
+        res.status(500).json({ error: "Failed to process sentiment analysis." });
     }
 });
+
+app.post("/summarize", async (req, res) => {
+        console.log("Received request to summarize:", req.body);
+        const { reviews } = req.body;
+
+        if (!reviews || !Array.isArray(reviews)) {
+            return res.status(400).json({ error: "Invalid input. Expected an array of reviews." });
+        }
+
+        try {
+            const reviewTexts = reviews.map((review) => review.review).join(' '); // Joins reviews into a single string
+
+            console.log("Full review text for summarization:\n", reviewTexts);
+            // Send the file content to the Hugging Face model for summarization
+            const chatCompletion = await client.chatCompletion({
+                model: "mistralai/Mistral-7B-Instruct-v0.3",
+                messages: [
+                {
+                    role: "user",
+                    content: `Please provide a summary of the following reviews in 75 words:\n\n${reviewTexts}`,
+                },
+                ],
+                max_tokens: 500, // Adjust token limit as needed
+      });
+  
+      // Get the summary from the response
+      const summary = chatCompletion.choices[0].message.content;
+  
+      // Return the summary in the response
+      return res.json({ summary });
+    } catch (error) {
+      console.error("Error processing reviews:", error);
+      return res.status(500).json({ error: "Failed to process reviews" });
+    }
+  });
 
 
 app.get('/products', async (req, res) => {

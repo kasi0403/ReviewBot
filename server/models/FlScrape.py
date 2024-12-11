@@ -1,11 +1,20 @@
 from flask import Flask, request, jsonify
 from playwright.sync_api import sync_playwright
 from flask_cors import CORS
+import json
 
 import time
 
 app = Flask(__name__)
 CORS(app)
+
+def toggle_sort(page):
+    try:
+        page.wait_for_selector("select.OZuttk.JEZ5ey")
+        page.select_option("select.OZuttk.JEZ5ey", 'MOST_RECENT')
+    
+    except Exception as e:
+        print(f"Error toggling sort: {e}")
 
 def get_product_details(page):
     try:
@@ -44,7 +53,108 @@ def get_product_details(page):
         print(f"Error occurred while getting product details: {e}")
         return {}
 
+def get_highlights(page):
+    try:
+        # Wait for the container div to load
+        page.wait_for_selector("div.DOjaWF", timeout=5000)
 
+        # Locate the container with highlights
+        highlights_div = page.query_selector("div.DOjaWF")
+        if highlights_div:
+            # Locate the div containing the "Highlights" list
+            Hlist = highlights_div.query_selector("div.xFVion")
+            if Hlist:
+                print("In the list div")
+                # Extract all list items under the ul element
+                ul_element = Hlist.query_selector("ul")
+                if ul_element:
+                    print("In the list element, extracting list items")
+                    highlights = [li.inner_text() for li in ul_element.query_selector_all("li._7eSDEz")]
+                    return highlights
+        return []
+    except Exception as e:
+        print(f"Error occurred while getting highlights: {e}")
+        return []
+
+
+
+def get_specifications(page):
+    try:
+        page.wait_for_selector("div._3Fm-hO", timeout=5000)
+        read_more_button = page.locator("button.QqFHMw._4FgsLt")
+        if read_more_button and read_more_button.is_visible():
+            read_more_button.click()
+            print("Clicked specs")
+            time.sleep(2)
+
+        specifications_divs = page.query_selector_all("div.GNDEQ-")
+        specifications = {}
+
+        for div in specifications_divs:
+    
+            category = div.query_selector("div._4BJ2V\\+").inner_text() if div.query_selector("div._4BJ2V\\+") else "Unknown Category"
+            table_rows = div.query_selector_all("tr.WJdYP6.row")
+            category_specs = {}
+            for row in table_rows:
+                key = row.query_selector("td.\\+fFi1w.col.col-3-12").inner_text() if row.query_selector("td.\\+fFi1w.col.col-3-12") else "Unknown Key"
+                value = row.query_selector("td.Izz52n.col.col-9-12").inner_text() if row.query_selector("td.Izz52n.col.col-9-12") else "Unknown Value"
+                category_specs[key] = value
+            specifications[category] = category_specs      
+        return specifications 
+       
+    except Exception as e:
+        try:
+            main_div = page.query_selector("div._5Pmv5S")
+            plus_button = main_div.query_selector("img")
+            if plus_button:
+                plus_button.click()
+                time.sleep(2)
+                print("Clicked plus button")
+            else:
+                return "No specifications found"
+            
+            try:
+                time.sleep(4)  
+                specs_div = page.query_selector("div.sBVJqn._8vsVX1")
+                if not specs_div:
+                    print("Specs div not found")
+                else:
+                    print("Specs div found")
+
+
+                read_more_button = page.wait_for_selector("button:has-text('Read More')", timeout=5000)
+
+                if not read_more_button:
+                    print("Read More button not found")
+                else:
+                    print("Read More button found")
+                    read_more_button.click()
+                    print("Clicked read more")
+                    time.sleep(2)
+
+                    product_specs = {}
+                    spec_rows = specs_div.query_selector_all("div.row")
+                    for row in spec_rows:
+                        label = row.query_selector(".col._9NUIO9")
+                        value = row.query_selector(".col.-gXFvC")
+
+                        if label and value:
+                            product_specs[label.text_content().strip()] = value.text_content().strip()
+                    product_specs_json = json.dumps(product_specs, indent=4)
+                    
+                    print(product_specs_json)
+                    return product_specs_json
+
+            except Exception as e:
+                print("Error clicking Read More button:", e)
+
+        except Exception as e:
+            print("Error in initial process:", e)
+                
+
+            
+
+        return "No specifications found"
 
 def get_reviews(page):
     try:
@@ -53,16 +163,18 @@ def get_reviews(page):
         first_anchor_tag = page.query_selector("a:has(div._23J90q)")
         if first_anchor_tag:
             first_anchor_tag.click()
-            print("Clicked")
+            print("Clicked view all reviews")
             time.sleep(3)
     except:
         print("Not clicked")
+    
+    toggle_sort(page)
 
     reviews_and_ratings = []
     pc = 0
     count = 0
 
-    while pc < 5:
+    while pc < 50:
         review_containers = page.query_selector_all("div.EKFha-")
         rating_elements = page.query_selector_all("div[class*='EKFha-'] div.XQDdHH.Ga3i8K")
 
@@ -134,17 +246,22 @@ def scrape():
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=False)
             context = browser.new_context()
             page = context.new_page()
             page.goto(url)
 
             product_details = get_product_details(page)
+            specs = get_specifications(page)
+            high = get_highlights(page)
             reviews = get_reviews(page)
+            
 
             response = {
                 'product_details': product_details,
-                'reviews': reviews
+                'reviews': reviews,
+                'specifications':specs,
+                'highlights':high
             }
 
             browser.close()
@@ -152,6 +269,9 @@ def scrape():
 
     except Exception as e:
         return jsonify({"error": f"Error occurred: {e}"}), 500
+    
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
