@@ -26,7 +26,9 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
             </div>
             <nav className={`navbar ${isMenuOpen ? 'active' : ''}`}>
                 {/* <Link to="/products">Products</Link> */}
+                {isLoggedIn &&
                 <Link to="/link">Link Insights</Link>
+}
                 {isLoggedIn ? (
                     <Link onClick={handleLogout}>Logout</Link>
                 ) : (

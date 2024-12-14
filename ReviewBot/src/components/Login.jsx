@@ -19,10 +19,13 @@ export default function Login({ setIsLoggedIn }) {
                 if (result.data.message === "User logged in successfully") {
                     setShowSuccess(true);
                     setIsLoggedIn(true)
+                    const token = result.data.token;
+                    sessionStorage.setItem('token', token);
                     setTimeout(() => {
                         setShowSuccess(false);
                         navigate('/');
                     }, 3500);
+                    // window.location.href = '/';
                 } else {
                     setShowError(true);
                     setTimeout(() => {

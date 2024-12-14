@@ -127,6 +127,8 @@
   height: 15rem;
 }
 /* Chatbot Section */
+
+/* Chatbot Section */
 .prod-chatbot-section {
   border-top: 1px solid #e5e7eb;
   padding-top: 2rem;
@@ -135,10 +137,14 @@
 .prod-chatbot-title {
   color: #374151;
   font-size: 1.5rem;
+  text-align: center;  /* Centers the title */
+  padding-left: 1rem; /* Optional, to add spacing from the left */
+  padding-right: 1rem; /* Optional, to add spacing from the right */
 }
 
+
 .prod-chatbot-wrapper {
-  background-color: rgba(255, 253, 253, 0.943);
+  background-color: #f9f9f9;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1rem;
@@ -148,16 +154,40 @@
   height: 16rem;
   overflow-y: auto;
   margin-bottom: 1rem;
-  background-color: #ddedff;
   border-radius: 1rem;
   padding: 1rem;
-  font-size: 1.3rem;
+}
+.message {
+  padding: 10px 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  max-width: 85%; /* Adjusts width */
+  word-wrap: break-word; /* Ensures text wraps within the container */
+}
+
+
+.user-message {
+  background-color: #3b82f6;
+  color: white;
+  align-self: flex-end;
+  text-align: right;
+  margin-left: auto;
+}
+
+.bot-message {
+  background-color: #e2e8f0;
+  color: #333;
+  align-self: flex-start;
 }
 
 .prod-chatbot-input {
   display: flex;
   gap: 0.5rem;
 }
+
+/* * {
+  font-size: 24px; /* Set globally */
+
 
 .prod-chatbot-input input {
   flex: 1;
@@ -168,6 +198,8 @@
   transition: border-color 0.3s;
 }
 
+
+
 .prod-chatbot-input input:focus {
   border-color: #3b82f6;
 }
@@ -176,10 +208,65 @@
   background-color: #3b82f6;
   color: white;
   border-radius: 0.5rem;
-  padding: 0.75rem;
+  padding: 1rem;
   transition: background-color 0.3s;
+  border: none;
 }
 
 .prod-chatbot-input button:hover {
-  background-color: #2563eb;
+  background-color: #558bff;
+}
+
+/* Icons for user and bot messages */
+.message {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.message-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.bot-message {
+  justify-content: flex-start;
+}
+
+/* Typing indicator with three dots */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background-color: #888;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  } 
+  40% {
+    transform: scale(1);
+  }
 }

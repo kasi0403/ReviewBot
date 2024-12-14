@@ -11,6 +11,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [showError,setShowError] = useState(false);
   const [showSucc,setShowSucc] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();

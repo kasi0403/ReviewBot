@@ -25,7 +25,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route exact path="/register" element={<Register />} />
-            <Route path="/link" element={<LinkInput setDetails={setDetails}/>} />
+            <Route path="/link" element={<LinkInput isLoggedIn={isLoggedIn} setDetails={setDetails}/>} />
             <Route path="/Description" element={<ProdDes details={details}/>} />
             <Route path="/chatbot" element={<Chatbot />} />
           </Routes>

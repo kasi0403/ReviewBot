@@ -4,8 +4,6 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-tokenizer = AutoTokenizer.from_pretrained("siebert/sentiment-roberta-large-english")
-model = AutoModelForSequenceClassification.from_pretrained("siebert/sentiment-roberta-large-english")
 
 @app.route('/senti', methods=['POST'])
 def analyze_sentiment():

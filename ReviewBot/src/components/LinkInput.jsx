@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "./LinkInput.css"
 import axios from 'axios';
 import Loader from './Loader';
+import Error from './Error';
 
-const LinkInputPage = ({setDetails}) => {
+const LinkInputPage = ({isLoggedIn,setDetails}) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -13,16 +14,45 @@ const LinkInputPage = ({setDetails}) => {
     setInputValue(e.target.value);
   };
 
+  useEffect(()=>{
+    if(isLoggedIn===false){
+      alert("Please login!")
+      setTimeout(()=>{
+        navigate('/login')
+      },1000)
+    }
+  })
+
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/linkInput', { inputValue });
-      console.log("Received in frontend = ", response.data.reviews);
-      const {product_details,reviews,specifications,highlights} = response.data.reviews; // Assuming `reviews` is an array
-      setDetails({details:product_details,reviews,specifications,highlights});
-      console.log("frontend prod details = ",product_details)
-      // Pass reviews to Description page via props
+      const token = sessionStorage.getItem('token');
+        
+        if (!token) {
+            alert('Please login first!');
+            navigate('/login');
+            return;
+        }
+      const response = await axios.post('http://localhost:3001/linkInput', { inputValue },{
+        headers: {
+            'Authorization': `Bearer ${token}`,  
+            'Content-Type': 'application/json',   
+        }
+    });
+      const {productDetails,summary,sentiment,highlights } = response.data;
+      setDetails({
+        image:productDetails.image,
+        name:productDetails.name,
+        price:productDetails.price,
+        sumRes:summary.summary,
+        pos:sentiment.positive,
+        neg:sentiment.negative,
+        high:highlights
+      });
+      console.log("Details in frontend:",productDetails,summary,sentiment,highlights);
+      
       navigate('/description');
+      
     } catch (error) {
       console.error("Error occurred:", error);
     } finally {
