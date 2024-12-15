@@ -47,6 +47,18 @@ const ProdDes = ({ details }) => {
 
     const newMessage = { sender: 'user', text: question };
     setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    // Call /storeMessage to store user message
+    try {
+      await axios.post("http://localhost:3001/storeMessage", {
+        productId: productDetails?._id, 
+        sender: 'user', 
+        text: question 
+      });
+    } catch (error) {
+      console.error('Error storing user message:', error);
+    }
+
     setQuestion('');
     setLoading(true);
 
@@ -54,6 +66,18 @@ const ProdDes = ({ details }) => {
       const response = await axios.post("http://localhost:3001/chatBot", { question });
       const botReply = { sender: 'bot', text: response.data?.answer || 'Sorry, I did not understand that.' };
       setChatMessages((prevMessages) => [...prevMessages, botReply]);
+
+      // Call /storeMessage to store bot reply
+      try {
+        await axios.post("http://localhost:3001/storeMessage", {
+          productId: productDetails?._id, 
+          sender: 'bot', 
+          text: botReply.text 
+        });
+      } catch (error) {
+        console.error('Error storing bot reply:', error);
+      }
+
     } catch (error) {
       const errorMessage = { sender: 'bot', text: 'Error: Unable to process your message at the moment.' };
       setChatMessages((prevMessages) => [...prevMessages, errorMessage]);
@@ -105,7 +129,6 @@ const ProdDes = ({ details }) => {
               <div className="prod-chatbot-messages" ref={chatContainerRef}>
                 {chatMessages.map((msg, index) => (
                   <div key={index} className={`message ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}>
-                    {/* Displaying bot message with icon outside the message */}
                     {msg.sender === 'bot' && (
                       <>
                         <div className="message-icon">
@@ -115,7 +138,6 @@ const ProdDes = ({ details }) => {
                       </>
                     )}
 
-                    {/* Displaying user message with icon outside the message */}
                     {msg.sender === 'user' && (
                       <>
                         <span className="message">{msg.text}</span>
@@ -148,7 +170,6 @@ const ProdDes = ({ details }) => {
               </div>
             </div>
           </div>
-
 
         </div>
       </div>

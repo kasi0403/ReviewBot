@@ -49,7 +49,7 @@ export default function Register() {
       {showError && <Error/>}
       <div className='container'>
           <form className='content' onSubmit={handleSubmit}>
-          <div className='head'>Register Form</div>
+          <div className='head'><span style={{color:"#facc15"}}>Register</span> Form</div>
           <h1>Create Account</h1>
             <input
               type="text"

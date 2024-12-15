@@ -55,7 +55,7 @@
   }
   
   .discover-btn:hover {
-    background-color: #4ca5117b;
+    background-color: #fadb2ff0;
   }
   .second-home{
     display: flex;
@@ -86,7 +86,7 @@
     color: black;
   }
   .btn-section .discover-btn:hover{
-    background-color: #abf27ce3;
+    background-color: #fadb2ff0;
     /* color: white; */
   }
   

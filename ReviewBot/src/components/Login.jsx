@@ -49,7 +49,7 @@ export default function Login({ setIsLoggedIn }) {
 
             <div className='container'>
                 <form className='content' onSubmit={handleSubmit}>
-                <div className='head'>Login Form</div>
+                <div className='head'><span style={{color:"#facc15"}}>Login</span> Form</div>
                 <h1>Member Log in</h1>
                     <input
                         type="text"

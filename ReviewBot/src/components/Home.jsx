@@ -25,7 +25,7 @@ const Home = ({isLoggedIn}) => {
       <div className="home-container">
         <div className="image-section"></div> 
         <div className="text-section">
-          <h1>Explore ProBot</h1>
+          <h1><span style={{color:"#facc15"}}>Explore</span> ProBot</h1>
           <p>Your Virtual Product Assistant</p>
           <button className="discover-btn" onClick={handleClick}>Discover More</button>
         </div>

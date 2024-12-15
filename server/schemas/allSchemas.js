@@ -67,44 +67,31 @@ const ProductSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', ProductSchema);
 
 
-
-// specific chats
 const ChatSchema = new mongoose.Schema({
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'users',
-        required:true
-    },
-    productId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'products',
-        required:true
-    },
-    conversation:{
-        type:Map,
-        of:String,
-        required: true,
-    }
-},{timestamps:true});
-const Chat = mongoose.model("chats",ChatSchema)
-
-
-
-// chats list for every user
-const ChatHistorySchema = new mongoose.Schema({
-    user : {
+    user: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'users', 
+        required: true },
+    productId: { 
         type: mongoose.Schema.Types.ObjectId,
-        required : true,
-        ref: 'users'
-    },
-    // store the id's of the chats 
-    chat : [{
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'chats'  
-    }]
-},{timestamps:true});
+         required: true },
+    conversation: { 
+        type: Map, 
+        of: String } // Ensuring conversation is a Map
+});
 
-const ChatHistory = mongoose.model("chatHistory",ChatHistorySchema)
+const ChatHistorySchema = new mongoose.Schema({
+    user: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'users', 
+        required: true },
+    chat: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Chat' }]
+});
+
+const Chat = mongoose.model('Chat', ChatSchema);
+const ChatHistory = mongoose.model('ChatHistory', ChatHistorySchema);
 
 module.exports = {
     RegisterModel,

@@ -26,7 +26,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff8b; /* White background for contrast */
+    background-color: #ffffffc8; /* White background for contrast */
     padding-left: 2rem; 
     padding-right: 2rem;
     border-radius: 12px; /* Rounded corners */
@@ -78,7 +78,7 @@
 }
 
 .button:hover {
-    background-color: #1d4ed8; /* Slightly darker blue on hover */
+    background-color: #fadb2ff0; /* Slightly darker blue on hover */
     transform: translateY(-2px);
 }
 

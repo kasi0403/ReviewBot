@@ -63,7 +63,7 @@ const LinkInputPage = ({isLoggedIn,setDetails}) => {
   return (
     <div className="pro-container">
       <div className="content">
-        <h2>Product Link</h2>
+        <h2><span style={{color:"#facc15"}}>Product</span> Link</h2>
         <input
           type="text"
           className="input"

@@ -7,7 +7,9 @@ import LinkInput from "./components/LinkInput";
 import Home from "./components/Home"; // Ensure you import Home
 import Register from "./components/Register";
 import ProdDes from "./components/ProdDes";
+import History from "./components/History";
 import './index.css';
+import ProductCard from "./components/ProductCard";
 
 
 export default function App() {
@@ -24,6 +26,7 @@ export default function App() {
             <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route exact path="/register" element={<Register />} />
             <Route path="/link" element={<LinkInput isLoggedIn={isLoggedIn} setDetails={setDetails}/>} />
+            <Route path="/history" element={<History setDetails={setDetails}/>}/>
             <Route path="/Description" element={<ProdDes details={details}/>} />
           </Routes>
         </div>

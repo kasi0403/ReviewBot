@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { RegisterModel, Product,History } = require("./schemas/allSchemas");
+const { RegisterModel, Product,History,ChatHistory,Chat} = require("./schemas/allSchemas");
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const axios = require('axios');
@@ -73,9 +73,9 @@ app.post('/login', (req, res) => {
                     const token = jwt.sign(
                         { id: user.id, email: user.email }, 
                         process.env.JWT_SECRET, 
-                        { expiresIn: '1h' } // Token will expire in 1 hour
+                        { expiresIn: '7d' } // Token will expire in 1 hour
                     );
-                    console.log("Token : ",token);
+                    // console.log("Token : ",token);
                     res.json({ message: "User logged in successfully", token:token});
                 } else {
                     res.status(400).json({ error: "Invalid credentials" });
@@ -102,119 +102,12 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// app.post('/linkInput', authenticateToken, async (req, res,next) => {
-//     const { inputValue} = req.body; 
-//     const {id : userID} = req.user;
-//     try {
-//         const data = qs.stringify({
-//             url: inputValue,
-//             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//           });
-//         const response = await axios.post('http://localhost:5000/scrape', data, {
-//             headers: {
-//               'Content-Type': 'application/x-www-form-urlencoded',
-//             },
-//           });
-//         console.log("data received in express = ",response.data)
-//         const reviews = response.data.reviews;
-//         const details = response.data.product_details;
-//         const high = response.data.highlights;
-//         const cat = response.data.category;
-//         let sentimentRes = null;
-//         let sumRes = null;
-//         try{
-//             let product = await Product.findOne({productLink:inputValue});
-//             let productID
-//             if(product){
-//                 productID = product._id;
-//                 console.log("Product already exists id = ",productID)
-//             }
-//             else{
-//                 const newProduct = new Product({
-//                     category:cat,
-//                     productName:details.name,
-//                     image:details.image,
-//                     productLink:inputValue
-//                 })
-//                 await newProduct.save()
-//                     .then(()=>{
-//                         productID = newProduct._id
-//                         console.log("New product created id = ",productID);
-//                     });
-//             }
-//             console.log("Product collection ended")
-//             let history = await History.findOne({ userID: userID });
-//             if (history) {
-//                 if (!history.productIDs.includes(productID)) {
-//                     await history.updateOne(
-//                         { userID: userID },  
-//                         { $push: { productIDs: productID } }  
-//                     );
-//                     console.log('New productID added to history');
-//                 } else {
-//                     console.log('Product already exists in history');
-//                 }
-//             } else {
-//                 const newHistory = new History({
-//                     userID:userID,
-//                     productIDs:[productID]
-//                 })
-//                 await newHistory.save()
-//                     .then(()=>{
-//                         console.log("History created for user");
-//                     })
-//             }
-//             console.log("History collection ended")
-//         }
-//         catch(error){
-//             console.log("Could not add data to mongo");
-//             console.log(error.message);
-//         }
-//         try{
-//             console.log("\n Loading knowledge base");
-//             await axios.post('http://127.0.0.1:8000/upload_reviews',{reviews})
-//             .then(console.log("Loaded successfully"))
-//         }
-//         catch(error){
-//             console.log(error);
-//             res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
-//         }
-//         try{
-//             console.log("\ncalling sentiment")
-//             sentimentRes = await axios.post('http://localhost:3001/analyzeSentiment',{ reviews})
-//         }
-//         catch(error){
-//             console.error(error)
-//             res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
-//         }
-//         try{
-//             sumRes = await axios.post(
-//              'http://localhost:3001/summarize',
-//              { reviews },
-//              { headers: { 'Content-Type': 'application/json' } }
-             
-//             );
-//             console.log("summarized");
-//         }
-//          catch(error){
-//            console.log("error in summarizing",error);
-//          }
-//         res.status(200).json({
-//             productDetails : details,
-//             summary : sumRes?.data,
-//             sentiment : sentimentRes?.data,
-//             highlights : high
-//         })
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Error occurred', error: error.message });
-//     }
-    
-// });
-
 app.post('/linkInput', authenticateToken, async (req, res, next) => {
+    console.log("Called link input")
     const { inputValue } = req.body; 
     const { id: userID } = req.user;
+    console.log(inputValue)
+    console.log(userID)
 
     // Step 1: Check if the inputValue is valid
     if (!inputValue || typeof inputValue !== 'string') {
@@ -250,7 +143,7 @@ app.post('/linkInput', authenticateToken, async (req, res, next) => {
                     category: cat,
                     productName: details.name,
                     image: details.image,
-                    productLink: inputValue
+                    productLink: inputValue,
                 });
             }
             else{
@@ -437,7 +330,6 @@ app.get('/history', authenticateToken, async (req, res) => {
     }
 });
 
-
 app.get('/products', async (req, res) => {
     const { prodID } = req.query; 
 
@@ -459,6 +351,60 @@ app.get('/products', async (req, res) => {
     }
 });
 
-app.listen(3001, () => {
+app.get('/chats', authenticateToken, async (req, res) => {
+    const { id: userID } = req.user;
+    const { productId } = req.query;
+  
+    try {
+      const chatHistory = await Chat.findOne({ user: userID, productId });
+      if (!chatHistory) {
+        return res.status(200).json({ conversation: [] }); // No previous chats
+      }
+      res.status(200).json({ conversation: chatHistory.conversation });
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      res.status(500).json({ message: 'Error fetching chat history' });
+    }
+  });
+  
+  // Route to store new messages
+  app.post('/storeMessage', authenticateToken, async (req, res) => {
+    const { id: userID } = req.user;
+    const { productId, sender, text } = req.body;
+  
+    try {
+      let chat = await Chat.findOne({ user: userID, productId });
+  
+      // If chat does not exist, create a new one
+      if (!chat) {
+        chat = new Chat({
+          user: userID,
+          productId,
+          conversation: { [new Date().toISOString()]: `${sender}: ${text}` }
+        });
+      } else {
+        // Append the new message to the existing conversation
+        chat.conversation.set(new Date().toISOString(), `${sender}: ${text}`);
+      }
+  
+      await chat.save();
+  
+      // Update the ChatHistory to keep track of all the user's chats
+      let chatHistory = await ChatHistory.findOne({ user: userID });
+      if (!chatHistory) {
+        chatHistory = new ChatHistory({ user: userID, chat: [chat._id] });
+      } else if (!chatHistory.chat.includes(chat._id)) {
+        chatHistory.chat.push(chat._id);
+      }
+      await chatHistory.save();
+  
+      res.status(200).json({ message: 'Message stored successfully' });
+    } catch (error) {
+      console.error('Error storing message:', error);
+      res.status(500).json({ message: 'Error storing message' });
+    }
+  });
+  
+  app.listen(3001, () => {
     console.log("Server is running on port 3001");
-});
+  });
