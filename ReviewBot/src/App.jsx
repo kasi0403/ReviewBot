@@ -5,9 +5,7 @@ import './bgAnimation.css'; // Ensure this path is correct
 import Login from "./components/Login";
 import LinkInput from "./components/LinkInput";
 import Home from "./components/Home"; // Ensure you import Home
-import ProductList from "./components/ProductList";
 import Register from "./components/Register";
-import Chatbot from "./components/Chatbot";
 import ProdDes from "./components/ProdDes";
 import './index.css';
 
@@ -22,12 +20,11 @@ export default function App() {
         <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         <div>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
             <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route exact path="/register" element={<Register />} />
             <Route path="/link" element={<LinkInput isLoggedIn={isLoggedIn} setDetails={setDetails}/>} />
             <Route path="/Description" element={<ProdDes details={details}/>} />
-            <Route path="/chatbot" element={<Chatbot />} />
           </Routes>
         </div>
       </div>

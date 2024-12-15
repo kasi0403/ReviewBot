@@ -22,49 +22,50 @@ const RegisterSchema = new mongoose.Schema({
 
 const RegisterModel = mongoose.model("users",RegisterSchema)
 
+// History Schema
+const HistorySchema = new mongoose.Schema({
+    userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users', 
+        required: true
+    },
+    productIDs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product', 
+        required: true
+    }]
+}, { timestamps: true });
 
+const History = mongoose.model('History', HistorySchema);
 
-// products list
-
+// Product Schema
 const ProductSchema = new mongoose.Schema({
     productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: function () {
+            return new mongoose.Types.ObjectId();
+        }
+    },
+    category: {
         type: String,
         required: true,
-        unique: true,
     },
     productName: {
         type: String,
         required: true,
     },
-    reviewList: [{
-        reviewText: String,
-        reviewRating: {
-            type: Number,
-            min: 0,
-            max: 5,
-            required: true,
-        },
-    }],
-    AvgRating: {
-        type: Number,
-        required: true,
-        default: 0,
-        min: 0,
-        max: 5,
-    },
-    reviewSummary: {
+    image: {
         type: String,
         required: true,
     },
-    pros: {
-        type: [String],
-    },
-    cons: {
-        type: [String],
+    productLink: {
+        type: String,
+        required: true,
     }
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', ProductSchema);
+
 
 
 // specific chats
@@ -107,6 +108,7 @@ const ChatHistory = mongoose.model("chatHistory",ChatHistorySchema)
 
 module.exports = {
     RegisterModel,
+    History,
     Product,
     Chat,
     ChatHistory

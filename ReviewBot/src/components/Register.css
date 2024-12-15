@@ -6,13 +6,14 @@
     align-items: center;
     height: 100vh; /* Full viewport height for vertical centering */
     width: 100%; /* Full width */
-    background-color: #f3f4f6; /* Light gray background for a clean look */
+    background-image: url("https://images.pexels.com/photos/6214383/pexels-photo-6214383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
+    background-size: cover;
     padding: 10px;
     /* box-sizing: border-box; */
 }
 
 .container h2 {
-    color: #3d74c2; /* Slightly lighter gray for subheading */
+    color: #334155; /* Slightly lighter gray for subheading */
 }
 .container h1{
     color: #334155;
@@ -25,7 +26,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff; /* White background for contrast */
+    background-color: #ffffff8b; /* White background for contrast */
     padding-left: 2rem; 
     padding-right: 2rem;
     border-radius: 12px; /* Rounded corners */

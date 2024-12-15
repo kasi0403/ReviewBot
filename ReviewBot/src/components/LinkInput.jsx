@@ -61,7 +61,7 @@ const LinkInputPage = ({isLoggedIn,setDetails}) => {
   };
 
   return (
-    <div className="container">
+    <div className="pro-container">
       <div className="content">
         <h2>Product Link</h2>
         <input

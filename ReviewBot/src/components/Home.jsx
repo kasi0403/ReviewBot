@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import "./Home.css"; // Ensure correct path for your CSS file
 import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+const Home = ({isLoggedIn}) => {
   const navigate = useNavigate();
   const secondHomeRef = useRef(null);
 
@@ -10,7 +10,14 @@ const Home = () => {
     secondHomeRef.current.scrollIntoView({ behavior: "smooth" });
   };
   const handleDirect = () =>{
-    navigate('/link')
+    if(isLoggedIn){
+      navigate('/link');
+    }
+    else{
+      alert("Please login!")
+      navigate('/login')
+    }
+
   }
 
   return (

@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { RegisterModel, Product } = require("./schemas/allSchemas");
+const { RegisterModel, Product,History } = require("./schemas/allSchemas");
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const axios = require('axios');
@@ -75,6 +75,7 @@ app.post('/login', (req, res) => {
                         process.env.JWT_SECRET, 
                         { expiresIn: '1h' } // Token will expire in 1 hour
                     );
+                    console.log("Token : ",token);
                     res.json({ message: "User logged in successfully", token:token});
                 } else {
                     res.status(400).json({ error: "Invalid credentials" });
@@ -84,83 +85,246 @@ app.post('/login', (req, res) => {
         .catch(err => res.status(500).json({ error: "Error finding user" }));
 });
 
-const authenticateToken = (req,res,next) => {
-    // console.log(req.headers)
+const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
+
     if (!token) {
         return res.status(401).json({ error: "Access Denied" });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: "Invalid Token" });
-        req.user = user; // Attach user info to the request
-        next(); // Pass to the next middleware
+        if (err) {
+            console.error("Error verifying token:", err);  // Debugging line
+            return res.status(403).json({ error: "Invalid Token" });
+        }
+        req.user = user; 
+        next();
     });
 };
 
-app.post('/linkInput', authenticateToken, async (req, res,next) => {
-    const { inputValue} = req.body;  // Get the link input from the user
+// app.post('/linkInput', authenticateToken, async (req, res,next) => {
+//     const { inputValue} = req.body; 
+//     const {id : userID} = req.user;
+//     try {
+//         const data = qs.stringify({
+//             url: inputValue,
+//             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//           });
+//         const response = await axios.post('http://localhost:5000/scrape', data, {
+//             headers: {
+//               'Content-Type': 'application/x-www-form-urlencoded',
+//             },
+//           });
+//         console.log("data received in express = ",response.data)
+//         const reviews = response.data.reviews;
+//         const details = response.data.product_details;
+//         const high = response.data.highlights;
+//         const cat = response.data.category;
+//         let sentimentRes = null;
+//         let sumRes = null;
+//         try{
+//             let product = await Product.findOne({productLink:inputValue});
+//             let productID
+//             if(product){
+//                 productID = product._id;
+//                 console.log("Product already exists id = ",productID)
+//             }
+//             else{
+//                 const newProduct = new Product({
+//                     category:cat,
+//                     productName:details.name,
+//                     image:details.image,
+//                     productLink:inputValue
+//                 })
+//                 await newProduct.save()
+//                     .then(()=>{
+//                         productID = newProduct._id
+//                         console.log("New product created id = ",productID);
+//                     });
+//             }
+//             console.log("Product collection ended")
+//             let history = await History.findOne({ userID: userID });
+//             if (history) {
+//                 if (!history.productIDs.includes(productID)) {
+//                     await history.updateOne(
+//                         { userID: userID },  
+//                         { $push: { productIDs: productID } }  
+//                     );
+//                     console.log('New productID added to history');
+//                 } else {
+//                     console.log('Product already exists in history');
+//                 }
+//             } else {
+//                 const newHistory = new History({
+//                     userID:userID,
+//                     productIDs:[productID]
+//                 })
+//                 await newHistory.save()
+//                     .then(()=>{
+//                         console.log("History created for user");
+//                     })
+//             }
+//             console.log("History collection ended")
+//         }
+//         catch(error){
+//             console.log("Could not add data to mongo");
+//             console.log(error.message);
+//         }
+//         try{
+//             console.log("\n Loading knowledge base");
+//             await axios.post('http://127.0.0.1:8000/upload_reviews',{reviews})
+//             .then(console.log("Loaded successfully"))
+//         }
+//         catch(error){
+//             console.log(error);
+//             res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
+//         }
+//         try{
+//             console.log("\ncalling sentiment")
+//             sentimentRes = await axios.post('http://localhost:3001/analyzeSentiment',{ reviews})
+//         }
+//         catch(error){
+//             console.error(error)
+//             res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
+//         }
+//         try{
+//             sumRes = await axios.post(
+//              'http://localhost:3001/summarize',
+//              { reviews },
+//              { headers: { 'Content-Type': 'application/json' } }
+             
+//             );
+//             console.log("summarized");
+//         }
+//          catch(error){
+//            console.log("error in summarizing",error);
+//          }
+//         res.status(200).json({
+//             productDetails : details,
+//             summary : sumRes?.data,
+//             sentiment : sentimentRes?.data,
+//             highlights : high
+//         })
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Error occurred', error: error.message });
+//     }
+    
+// });
+
+app.post('/linkInput', authenticateToken, async (req, res, next) => {
+    const { inputValue } = req.body; 
+    const { id: userID } = req.user;
+
+    // Step 1: Check if the inputValue is valid
+    if (!inputValue || typeof inputValue !== 'string') {
+        return res.status(400).json({ message: 'Invalid product link provided' });
+    }
+
     try {
         const data = qs.stringify({
             url: inputValue,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          });
+        });
+
         const response = await axios.post('http://localhost:5000/scrape', data, {
             headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-          });
-        console.log("data received in express = ",response.data)
+        });
+
+        console.log("Data received in express = ", response.data);
         const reviews = response.data.reviews;
         const details = response.data.product_details;
         const high = response.data.highlights;
+        const cat = response.data.category;
+
         let sentimentRes = null;
-        let sumRes = null; 
-        try{
-            console.log("\n Loading knowledge base");
-            await axios.post('http://127.0.0.1:8000/upload_reviews',{reviews})
-            .then(console.log("Loaded successfully"))
-        }
-        catch(error){
-            console.log(error);
-            res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
-        }
-        try{
-            console.log("\ncalling sentiment")
-            sentimentRes = await axios.post('http://localhost:3001/analyzeSentiment',{ reviews})
-        }
-        catch(error){
-            console.error(error)
-            res.status(500).json({ message: 'Error occurred with sentiment', error: error.message })
-        }
-        try{
-            sumRes = await axios.post(
-             'http://localhost:3001/summarize',
-             { reviews },
-             { headers: { 'Content-Type': 'application/json' } }
-             
+        let sumRes = null;
+        let newProduct
+        try {
+            const product = await Product.findOne({productLink:inputValue})
+            if(!product){
+                console.log("Product does not exist")
+                newProduct = await Product.create({
+                    category: cat,
+                    productName: details.name,
+                    image: details.image,
+                    productLink: inputValue
+                });
+            }
+            else{
+                console.log("Product already exists")
+                newProduct = product;
+            }
+            // console.log("Product ID (from _id):", newProduct._id);
+        } 
+        catch (err) {
+            console.log("Error creating product: ", err.message);
+            return res.status(500).json({ message: 'Error saving product to database', error: err.message });
+        }        
+        try {
+            const productID = newProduct._id;
+            // console.log("New product created with ID = ", productID);
+            
+            const updatedHistory = await History.findOneAndUpdate(
+                { userID: userID }, 
+                { $addToSet: { productIDs: productID } }, 
+                { new: true, upsert: true }
             );
-            console.log("summarized");
+        
+            // console.log('Updated History:', updatedHistory);
+            console.log("History collection completed");
+            console.log("Product collection completed");
+        } 
+        catch (error) {
+            console.log("Error saving in history");
+            console.log(error.message);
+        }        
+        try {
+            console.log("\nLoading knowledge base");
+            await axios.post('http://127.0.0.1:8000/upload_reviews', { reviews });
+            console.log("Loaded successfully");
+        } catch (error) {
+            console.log("Error loading knowledge base: ", error.message);
+            return res.status(500).json({ message: 'Error occurred with knowledge base', error: error.message });
         }
-         catch(error){
-           console.log("error in summarizing",error);
-         }
+
+        try {
+            console.log("\nCalling sentiment analysis");
+            sentimentRes = await axios.post('http://localhost:3001/analyzeSentiment', { reviews });
+        } catch (error) {
+            console.error("Sentiment analysis failed: ", error.message);
+            return res.status(500).json({ message: 'Error occurred with sentiment', error: error.message });
+        }
+
+        try {
+            sumRes = await axios.post(
+                'http://localhost:3001/summarize',
+                { reviews },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            console.log("Summary successful");
+        } catch (error) {
+            console.log("Error in summarization: ", error.message);
+        }
+
         res.status(200).json({
-            productDetails : details,
-            summary : sumRes?.data,
-            sentiment : sentimentRes?.data,
-            highlights : high
-        })
+            productDetails: details,
+            summary: sumRes?.data,
+            sentiment: sentimentRes?.data,
+            highlights: high,
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error occurred', error: error.message });
+        console.error("Server error: ", error.message);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
-    
 });
 
 
+
 app.post('/analyzeSentiment', async (req, res) => {
-    console.log("Received request:", req.body);
+    // console.log("Received request:", req.body);
     const { reviews } = req.body;
 
     if (!reviews || !Array.isArray(reviews)) {
@@ -170,7 +334,7 @@ app.post('/analyzeSentiment', async (req, res) => {
     try {
         console.log("\nin sentiment function")
         const reviewTexts = reviews.map((review) => review.review);
-        console.log(reviewTexts);
+        // console.log(reviewTexts);
         const response = await axios.post('http://localhost:5000/senti', {reviewTexts} , {
             headers: {
                 'Content-Type': 'application/json',  
@@ -192,7 +356,7 @@ app.post('/analyzeSentiment', async (req, res) => {
 });
 
 app.post("/summarize", async (req, res) => {
-        console.log("Received request to summarize:", req.body);
+        // console.log("Received request to summarize:", req.body);
         const { reviews } = req.body;
 
         if (!reviews || !Array.isArray(reviews)) {
@@ -202,8 +366,8 @@ app.post("/summarize", async (req, res) => {
         try {
             const reviewTexts = reviews.map((review) => review.review).join(' '); // Joins reviews into a single string
 
-            console.log("Full review text for summarization:\n", reviewTexts);
-            // Send the file content to the Hugging Face model for summarization
+            // console.log("Full review text for summarization:\n", reviewTexts);
+    
             const chatCompletion = await client.chatCompletion({
                 model: "mistralai/Mistral-7B-Instruct-v0.3",
                 messages: [
@@ -215,10 +379,8 @@ app.post("/summarize", async (req, res) => {
                 max_tokens: 400, // Adjust token limit as needed
       });
   
-      // Get the summary from the response
       const summary = chatCompletion.choices[0].message.content;
   
-      // Return the summary in the response
       return res.json({ summary });
     } catch (error) {
       console.error("Error processing reviews:", error);
@@ -238,12 +400,62 @@ app.post('/chatBot',async(req,res)=>{
     }
 })
 
-app.get('/products', async (req, res) => {
+app.get('/history', authenticateToken, async (req, res) => {
+    const { id: userID } = req.user;
+
     try {
-        const products = await Product.find(); // Await the result of Product.find()
-        res.status(200).json(products); // Send the products as JSON
+        const history = await History.findOne({ userID: userID }, { productIDs: 1, _id: 0 });
+
+        if (!history || !history.productIDs.length) {
+            return res.status(404).json({ message: 'No history found for this user' });
+        }
+
+        const prodIDs = history.productIDs; 
+
+        const hist = await Promise.all(
+            prodIDs.map(async (prodID) => {
+                try {
+                    const productResponse = await axios.get(`http://localhost:3001/products`, { params: { prodID } });
+                    return productResponse.data;
+                } catch (error) {
+                    console.log(`Error fetching product with ID ${prodID}:`, error.message);
+                    return null; 
+                }
+            })
+        );
+
+        const filteredHistory = hist.filter(Boolean); 
+
+        res.status(200).json({
+            history: filteredHistory
+        });
+
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching products', error: error.message });
+        console.log("Error fetching history");
+        console.log(error.message);
+        res.status(500).json({ message: 'Error fetching history', error: error.message });
+    }
+});
+
+
+app.get('/products', async (req, res) => {
+    const { prodID } = req.query; 
+
+    try {
+        const product = await Product.findOne({ 
+            $or: [
+                { _id: prodID }, 
+                { productId: prodID } 
+            ] 
+        }); 
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        
+        res.status(200).json(product); 
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching product', error: error.message });
     }
 });
 

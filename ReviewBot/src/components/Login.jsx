@@ -66,10 +66,11 @@ export default function Login({ setIsLoggedIn }) {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <button type="submit" className="button">LogIn</button>
-                </form>
-                <p className="text">
+                    <p className="text">
                     New Here? <Link to="/register">Register</Link>
-                </p>
+                    </p>
+                    <br/>
+                </form>
             </div>
         </>
     );

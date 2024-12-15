@@ -95,6 +95,28 @@ def get_product_details(page):
         print(f"Error occurred while getting product details: {e}")
         return {}
 
+def get_category(page):
+    try:
+        print("Getting category")
+        page.wait_for_selector("div.DOjaWF", timeout=5000)
+ 
+        cat_divs = page.query_selector_all("div.DOjaWF div.r2CdBx")
+        
+        if len(cat_divs) > 1: 
+            print("in cat lists")
+            cat_div = cat_divs[1]  
+            cat_link = cat_div.query_selector("a")
+            
+            if cat_link:
+                print("got category name")
+                name = cat_link.inner_text() 
+                return name
+        
+        return ""
+    except Exception as e:
+        print(f"Error occurred while getting category: {e}")
+        return ""
+
 def get_highlights(page):
     try:
         # Wait for the container div to load
@@ -287,6 +309,7 @@ def scrape():
             page = context.new_page()
             page.goto(url)
 
+            category = get_category(page)
             product_details = get_product_details(page)
             specs = get_specifications(page)
             high = get_highlights(page)
@@ -295,6 +318,7 @@ def scrape():
 
             response = {
                 'product_details': product_details,
+                'category':category,
                 'reviews': reviews,
                 'specifications':specs,
                 'highlights':high

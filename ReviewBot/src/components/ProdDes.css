@@ -2,13 +2,13 @@
 .prod-container {
   /* margin-top: 4rem; */
   min-height: 100vh;
-  background-color: #f3f4f6;
-  padding: 5rem 3rem;
+  background-color: #040300;
+  padding: 5rem 5rem;
 }
 
 .prod-wrapper {
-  max-width: 7xl;
-  margin: 0 auto;
+  /* max-width: 7xl; */
+  margin: 2rem auto;
   
 }
 
@@ -16,7 +16,6 @@
   background-color: white;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 /* Main Product Section */
@@ -70,7 +69,7 @@
 .prod-price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: #2f7b3d;
   margin-bottom: 1.5rem;
 }
 
@@ -88,7 +87,7 @@
 /* Analysis Section */
 .prod-summary-section {
   border-top: 1px solid #e5e7eb;
-  padding: 2rem 2rem;
+  padding: 2rem;
 }
 
 .prod-summary-wrapper {
@@ -117,77 +116,101 @@
 }
 
 .prod-sentiment-title {
-  color: #374151;
-  font-size: 1.5rem;
+  color: #4a5462;
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
 }
 
 .prod-sentiment-chart {
   position:relative;
-  width: 15rem;
-  height: 15rem;
+  width: 20rem;
+  height: 20rem;
 }
-/* Chatbot Section */
+
+
+
 
 /* Chatbot Section */
 .prod-chatbot-section {
   border-top: 1px solid #e5e7eb;
-  padding-top: 2rem;
 }
 
 .prod-chatbot-title {
   color: #374151;
-  font-size: 1.5rem;
-  text-align: center;  /* Centers the title */
-  padding-left: 1rem; /* Optional, to add spacing from the left */
-  padding-right: 1rem; /* Optional, to add spacing from the right */
+  font-size: 2rem;
+  text-align: center; /* Centers the title */
+  padding: 2rem;
 }
 
-
 .prod-chatbot-wrapper {
-  background-color: #f9f9f9;
+  background-color: #f9f9f9d5;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  font-size: 1.2rem;
 }
 
 .prod-chatbot-messages {
-  height: 16rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 20rem;
   overflow-y: auto;
   margin-bottom: 1rem;
   border-radius: 1rem;
-  padding: 1rem;
+  padding: 0.5rem;
 }
+
 .message {
-  padding: 10px 15px;
-  border-radius: 15px;
-  margin-bottom: 10px;
-  max-width: 85%; /* Adjusts width */
+  display: flex;
+  align-items: center;
+  /* margin: 10px; */
+  max-width: 90%; /* Adjusts width */
   word-wrap: break-word; /* Ensures text wraps within the container */
 }
 
+/* Adjustments for icon placement */
+.message-icon {
+  font-size: 24px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
 
+.message {
+  display: flex;
+  align-items: center;
+}
+
+/* User message styles */
 .user-message {
   background-color: #3b82f6;
   color: white;
-  align-self: flex-end;
-  text-align: right;
-  margin-left: auto;
+  align-self: flex-end; /* Aligns to the right */
+  text-align: left;
+  border-radius: 15px;
+  padding: 10px 15px;
+  margin-left: auto; /* Pushes it to the right */
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
 }
 
+/* Bot message styles */
 .bot-message {
   background-color: #e2e8f0;
   color: #333;
-  align-self: flex-start;
+  align-self: flex-start; /* Aligns to the left */
+  border-radius: 15px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
 }
 
 .prod-chatbot-input {
   display: flex;
   gap: 0.5rem;
 }
-
-/* * {
-  font-size: 24px; /* Set globally */
-
 
 .prod-chatbot-input input {
   flex: 1;
@@ -197,8 +220,6 @@
   outline: none;
   transition: border-color 0.3s;
 }
-
-
 
 .prod-chatbot-input input:focus {
   border-color: #3b82f6;
@@ -215,26 +236,6 @@
 
 .prod-chatbot-input button:hover {
   background-color: #558bff;
-}
-
-/* Icons for user and bot messages */
-.message {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.message-icon {
-  font-size: 24px;
-  margin-right: 10px;
-}
-
-.user-message {
-  justify-content: flex-end;
-}
-
-.bot-message {
-  justify-content: flex-start;
 }
 
 /* Typing indicator with three dots */
@@ -268,5 +269,11 @@
   } 
   40% {
     transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .prod-container {
+    width: 110vw;
   }
 }

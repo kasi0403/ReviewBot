@@ -99,27 +99,38 @@ const ProdDes = ({ details }) => {
               </div>
             )}
           </div>
-
           <div className="prod-chatbot-section">
             <h2 className="prod-chatbot-title">Product Assistant</h2>
             <div className="prod-chatbot-wrapper">
               <div className="prod-chatbot-messages" ref={chatContainerRef}>
                 {chatMessages.map((msg, index) => (
                   <div key={index} className={`message ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}>
-                    <div style={{paddingRight:"1rem"}}>
-                    {msg.sender === 'bot' && <FaRobot size={24} className="bot-icon" />}
-                    </div>
-                    <span className="message-text">{msg.text}</span>
-                    <div style={{paddingLeft:"1rem"}}>
-                    {msg.sender === 'user' && <FaUser size={24} className="user-icon" />}
-                    </div>
+                    {/* Displaying bot message with icon outside the message */}
+                    {msg.sender === 'bot' && (
+                      <>
+                        <div className="message-icon">
+                          <FaRobot size={24} />
+                        </div>
+                        <span className="message">{msg.text}</span>
+                      </>
+                    )}
+
+                    {/* Displaying user message with icon outside the message */}
+                    {msg.sender === 'user' && (
+                      <>
+                        <span className="message">{msg.text}</span>
+                        <div className="message-icon">
+                          <FaUser size={24} />
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
                 {loading && (
-                  <div className='typing-indicator'>
-                  <div className="typing-dots">
-                    <span>.</span><span>.</span><span>.</span>
-                  </div>
+                  <div className="typing-indicator">
+                    <div className="typing-dots">
+                      <span>.</span><span>.</span><span>.</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -137,6 +148,7 @@ const ProdDes = ({ details }) => {
               </div>
             </div>
           </div>
+
 
         </div>
       </div>
